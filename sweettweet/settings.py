@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
+    'tweets.apps.TweetsConfig',
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,9 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'sweettweet/static')]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# valid file extensions
+VALID_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif']
+VALID_VIDEO_EXTENSIONS = ['.mp4']
+VALID_FILE_EXTENSIONS = VALID_IMAGE_EXTENSIONS + VALID_VIDEO_EXTENSIONS
