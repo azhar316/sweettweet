@@ -1,3 +1,8 @@
 from django.shortcuts import render
 
-# Create your views here.
+from .models import Tweet
+
+
+def home(request):
+    tweets = Tweet.objects.all()
+    return render(request, 'tweets/home.html', {'tweets': tweets})

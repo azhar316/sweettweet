@@ -56,7 +56,7 @@ ROOT_URLCONF = 'sweettweet.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'sweettweet', 'templates'), ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -129,7 +129,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # used to reference static (css) files from templates
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'sweettweet/static')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'sweettweet', 'static'), ]
 
 
 MEDIA_URL = '/media/'

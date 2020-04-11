@@ -1,0 +1,15 @@
+{% extends 'sweettweet/base.html' %}
+
+{% block content %}
+<div> Welcome to tweets home</div>
+<div class="tweet">
+    {% for tweet in tweets %}
+    <p>{{tweet.text}}</p>
+    <img src="{{tweet.media.url}}">
+    <p>
+        <span>{{tweet.likes.count}}</span>
+        <span>{{tweet.retweets.count}}</span>
+    </p>
+    {% endfor %}
+</div>
+{% endblock content %}
