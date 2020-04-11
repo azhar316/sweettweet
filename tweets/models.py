@@ -36,3 +36,12 @@ class Tweet(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class TweetComment(models.Model):
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="tweetcomments")
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE, related_name='comments')
+    text = models.CharField(max_length=200, help_text='200 characters or fewer')
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
