@@ -1,15 +1,29 @@
 {% extends 'sweettweet/base.html' %}
 
 {% block content %}
-<div> Welcome to tweets home</div>
-<div class="tweet">
+<div class="tweet-new">
+    {% if user.is_authenticated %}
+    <form action="{% url 'tweets:tweet_create'%}" method="post" class="post-form">{%csrf_token%}
+        {{ tweet_form.as_p }}
+        <button type="submit">Tweet</button>
+    </form>
+    {% endif %}
+</div>
+<div class="tweets">
     {% for tweet in tweets %}
-    <p>{{tweet.text}}</p>
-    <img src="{{tweet.media.url}}">
-    <p>
-        <span>{{tweet.likes.count}}</span>
-        <span>{{tweet.retweets.count}}</span>
-    </p>
+    <a href="{% url 'tweets:tweet_detail' tweet.pk %}">
+        <div class="tweet">
+            <p>{{tweet.text}}</p>
+            {% if tweet.image %}
+            <img src="{{tweet.media.url}}">
+            {% endif %}
+            <p>
+                <span>{{tweet.likes.count}}</span>
+                <span>{{tweet.retweets.count}}</span>
+                <span>{{tweet.comments.count}}</span>
+            </p>
+        </div>
+    </a>
     {% endfor %}
 </div>
 {% endblock content %}

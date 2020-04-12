@@ -1,0 +1,35 @@
+{% extends 'sweettweet/base.html' %}
+
+{% block content %}
+<div class="tweet">
+    <div>
+        <p>{{tweet.text}}</p>
+        {% if tweet.image %}
+        <img src="{{tweet.media.url}}">
+        {% endif %}
+        <a href="">{{tweet.likes.count}}</a>
+        <a href="">{{tweet.retweets.count}}</a>
+        <a href="">{{tweet.comments.count}}</a>
+        {% if tweet.user == request.user %}
+        <a href="{% url 'tweets:tweet_update' tweet.pk %}">Update</a>
+        <a href="{% url 'tweets:tweet_delete' tweet.pk %}">Delete</a>
+        {% endif %}
+    </div>
+    <div class="tweet-comments">
+        {% if request.user.is_authenticated %}
+        <div class="add-tweet-comment">
+            <form method="post" class="post-form">{% csrf_token %}
+                {{ comment_form.as_p }}
+                <button type="submit" class="btn">Comment</button>
+            </form>
+        </div>
+        {% endif %}
+        {% for comment in tweet.comments.all %}
+        <div class="tweet-comment">
+            <p>{{comment.user.email}}</p>
+            <p>{{comment.text}}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}
