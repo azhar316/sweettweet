@@ -18,7 +18,9 @@
     <div class="tweet-comments">
         {% if request.user.is_authenticated %}
         <div class="add-tweet-comment">
-            <form method="post" class="post-form">{% csrf_token %}
+            <form action="{% url 'tweets:tweet_comment_create' %}" method="post" class="post-form">{% csrf_token %}
+                <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+                <input type="hidden" name="previous_page" value="{{request.path}}">
                 {{ comment_form.as_p }}
                 <button type="submit" class="btn">Comment</button>
             </form>
@@ -28,8 +30,27 @@
         <div class="tweet-comment">
             <p>{{comment.user.email}}</p>
             <p>{{comment.text}}</p>
+            {% if comment.user == request.user %}
+            <a href="{% url 'tweets:tweet_comment_update' comment.id %}" class="btn">Update</a>
+            <form action="{% url 'tweets:tweet_comment_delete' %}" method="post">{%csrf_token%}
+                <input type="hidden" name="comment_id" value="{{comment.id}}">
+                <input type="hidden" name="previous_page" value="{{request.path}}">
+                <button type="submit" class="btn delete-link">delete</button>
+            </form>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
 </div>
+
+<script>
+    $(".delete-link").click(function(){
+    confirm_box = confirm("Are you sure?");
+    if(confirm_box == true)
+        return true;
+    else
+        return false;
+})
+</script>
+
 {% endblock content %}

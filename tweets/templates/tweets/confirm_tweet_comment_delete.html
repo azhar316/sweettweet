@@ -1,0 +1,14 @@
+{% extends 'sweettweet/base.html' %}
+
+{% block content %}
+<div>
+    <p>Are you sure you want to delete the comment?</p>
+    <p>{{tweet_comment.text}}</p>
+
+    <form method="post" class="post-form">{%csrf_token%}
+        {{form.as_p}}
+        <button type="button">Delete</button>
+        <a href="{{previous_page}}" class="btn">Cancel</a>
+    </form>
+</div>
+{% endblock content%}

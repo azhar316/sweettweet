@@ -1,4 +1,5 @@
-from django.shortcuts import render, HttpResponseRedirect, redirect, reverse
+from django.shortcuts import (render, HttpResponseRedirect,
+                              redirect, reverse, get_object_or_404)
 from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -19,6 +20,8 @@ class IndexView(generic.ListView):
         context['tweet_form'] = TweetForm()
         return context
 
+
+# CRUD views of Tweet Model
 
 class TweetCreateView(LoginRequiredMixin, generic.View):
 
@@ -64,3 +67,57 @@ class TweetDeleteView(LoginRequiredMixin, generic.DeleteView):
 
     def get_queryset(self):
         return Tweet.objects.filter(user=self.request.user)
+
+
+# CRUD views of TweetComment
+
+class TweetCommentCreateView(LoginRequiredMixin, generic.View):
+
+    def get(self, *args, **kwargs):
+        return reverse('tweets:home')
+
+    def post(self, *args, **kwargs):
+        tweet_comment_form = TweetCommentForm(self.request.POST)
+        tweet_comment = tweet_comment_form.save(commit=False)
+        tweet_comment.user = self.request.user
+        tweet = get_object_or_404(Tweet, id=self.request.POST.get('tweet_id'))
+        tweet_comment.tweet = tweet
+        tweet_comment.save()
+        return redirect(self.request.POST.get('previous_page', '/'))
+
+
+# No need of Detail View for TweetComment
+
+class TweetCommentUpdateView(LoginRequiredMixin, generic.UpdateView):
+
+    form_class = TweetCommentForm
+    template_name = 'tweets/tweet_comment_update.html'
+
+    def get_queryset(self):
+        return TweetComment.objects.filter(user=self.request.user)
+
+    def get_success_url(self):
+        return reverse('tweets:tweet_detail', args=(self.object.tweet.id,))
+
+
+class TweetCommentDeleteView(LoginRequiredMixin, generic.DeleteView):
+
+    # Use javascript confirmation for deleting a TweetComment.
+    # Use the form post method to bypass django's delete confirmation
+    # process.
+
+    # template_name = 'tweets/confirm_tweet_comment_delete.html'
+    context_object_name = 'tweet_comment'
+
+    def get_object(self, queryset=None):
+        queryset = TweetComment.objects.filter(user=self.request.user)
+        object = get_object_or_404(queryset, id=self.request.POST.get('comment_id'))
+        return object
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['previous_page'] = self.request.POST.get('previous_page', '/')
+        return context
+
+    def get_success_url(self):
+        return self.request.POST.get('previous_page', '/')

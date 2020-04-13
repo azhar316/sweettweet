@@ -11,4 +11,7 @@ urlpatterns = [
     path('tweet/detail/<int:pk>/', views.TweetDetailView.as_view(), name='tweet_detail'),
     path('tweet/update/<int:pk>/', views.TweetUpdateView.as_view(), name='tweet_update'),
     path('tweet/delete/<int:pk>/', views.TweetDeleteView.as_view(), name='tweet_delete'),
+    path('tweet/comment/create/', views.TweetCommentCreateView.as_view(), name='tweet_comment_create'),
+    path('tweet/comment/update/<int:pk>/', views.TweetCommentUpdateView.as_view(), name='tweet_comment_update'),
+    path('tweet/comment/delete/', views.TweetCommentDeleteView.as_view(), name='tweet_comment_delete'),
 ]
