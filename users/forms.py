@@ -1,11 +1,12 @@
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.contrib.auth.models import UnicodeUsernameValidator
 
-from .models import User
+from .models import User, UserProfile
 
 
 class UserCreationForm(forms.ModelForm):
-    """A form for creating new users. Includes all the required fields,
+    """A form for creating new users in admin site. Includes all the required fields,
     plus a repeated password."""
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
@@ -31,7 +32,7 @@ class UserCreationForm(forms.ModelForm):
 
 
 class UserChangeForm(forms.ModelForm):
-    """A form for updating user. Includes all the fields on the
+    """A form for updating user in admin site. Includes all the fields on the
     user, but replaces password field with admin's hashed password
     display field."""
     password = ReadOnlyPasswordHashField()
@@ -45,3 +46,18 @@ class UserChangeForm(forms.ModelForm):
         # This is done here, rather than on the field because the field
         # does not have access to the initial value
         return self.initial["password"]
+
+
+class UserProfileUpdateForm(forms.Form):
+
+    full_name = forms.CharField(max_length=100, required=True)
+    username = forms.CharField(
+        max_length=150,
+        help_text='Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.',
+        validators=[UnicodeUsernameValidator()],
+        required=True
+    )
+    email = forms.EmailField(required=True)
+    avatar = forms.ImageField(label='profile pic', required=False)
+    bio = forms.CharField(max_length=200, required=False,
+                          widget=forms.Textarea(attrs={'cols': 40,  'rows': 3}))

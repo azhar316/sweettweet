@@ -1,0 +1,12 @@
+{% extends 'sweettweet/base.html' %}
+
+{% block content %}
+<div>
+    <p>{{ profile.full_name }}</p>
+    <p>{{ request.user.username }}</p>
+    <p>{{ request.user.email }}</p>
+    <p>{{ profile.bio }}</p>
+    <img src="{{ profile.avatar.url }}">
+    <p><a href="{% url 'users:user_update' %}" class="btn">update</a></p>
+</div>
+{% endblock %}
