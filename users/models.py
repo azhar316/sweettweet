@@ -1,6 +1,11 @@
+import os
+
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin, UnicodeUsernameValidator)
+
+from . import utils
 
 
 class UserManager(BaseUserManager):
@@ -84,3 +89,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def has_module_perms(self, app_label):
         return self.is_staff
+
+
+class UserProfile(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    full_name = models.CharField(max_length=100)
+    bio = models.CharField(max_length=200, blank=True)
+    birth_date = models.DateField(blank=True, null=True)
+    avatar = models.ImageField('profile_pic', upload_to=utils.get_image_path,
+                               blank=True,
+                               default=os.path.join('images', 'profile_pics', 'default-user.jpg'))
+    # symmetrical: if A is a friend of B then B is a friend of A
+    # since we are defining following and followers we don't want that relation.
+    following = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='followers')
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.full_name
