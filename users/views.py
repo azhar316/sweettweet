@@ -96,7 +96,10 @@ class UserProfileUpdateView(LoginRequiredMixin, generic.View):
             user.email = form.cleaned_data.get('email')
             user.profile.full_name = form.cleaned_data.get('full_name')
             user.profile.bio = form.cleaned_data.get('bio')
-            user.profile.avatar = form.cleaned_data.get('avatar')
+            avatar = form.cleaned_data.get('avatar')
+            if avatar:
+                user.profile.avatar = avatar
+            user.profile.save()
             user.save()
         else:
             raise ValidationError("Invalid form data")
