@@ -48,6 +48,46 @@ class UserChangeForm(forms.ModelForm):
         return self.initial["password"]
 
 
+class UserRegisterForm(forms.Form):
+
+    full_name = forms.CharField(max_length=100, required=True)
+    username = forms.CharField(
+        max_length=150,
+        help_text='Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.',
+        validators=[UnicodeUsernameValidator()],
+        required=True
+    )
+    email = forms.EmailField(required=True)
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("Username is already taken")
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("There is already an account "
+                                        "associated with this email")
+        return email
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Passwords don't match")
+        return password2
+
+
+class UserLoginForm(forms.Form):
+
+    username = forms.CharField(max_length=150, required=True)
+    password = forms.CharField(label='Password', widget=forms.PasswordInput)
+
+
 class UserProfileUpdateForm(forms.Form):
 
     full_name = forms.CharField(max_length=100, required=True)

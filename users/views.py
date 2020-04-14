@@ -3,9 +3,62 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
+from django.contrib.auth import authenticate, login, logout
 
-from .models import UserProfile
-from .forms import UserProfileUpdateForm
+from .models import User, UserProfile
+from .forms import UserProfileUpdateForm, UserRegisterForm, UserLoginForm
+
+
+class UserRegisterView(generic.FormView):
+
+    form_class = UserRegisterForm
+    template_name = 'users/register.html'
+    success_url = reverse_lazy('users:user_detail')
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('users:user_detail')
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        username = form.cleaned_data.get('username')
+        email = form.cleaned_data.get('email')
+        password = form.cleaned_data.get('password2')
+        full_name = form.cleaned_data.get('full_name')
+        user, user_profile = UserProfile.objects.create_user_and_profile(full_name=full_name,
+                                                                         username=username,
+                                                                         email=email,
+                                                                         password=password)
+        login(self.request, user)
+        return super().form_valid(form)
+
+
+class UserLoginView(generic.FormView):
+
+    form_class = UserLoginForm
+    template_name = 'users/login.html'
+    success_url = reverse_lazy('users:user_detail')
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('users:user_detail')
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        user = authenticate(username=username, password=password)
+        if user is None:
+            error_message = 'username and password do not match'
+            return render(self.request, self.template_name,
+                          {'form': form, 'error_message': error_message})
+        login(self.request, user)
+        return super().form_valid(form)
+
+
+def log_out(request):
+    logout(request)
+    return redirect('/')
 
 
 class UserProfileDetailView(LoginRequiredMixin, generic.DetailView):

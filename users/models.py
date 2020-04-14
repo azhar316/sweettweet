@@ -91,6 +91,18 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.is_staff
 
 
+class UserProfileManager(models.Manager):
+
+    def create_user_and_profile(self, full_name, username, email, password, **extra_fields):
+        if not full_name:
+            raise ValueError('full_name must be set')
+
+        user = User.objects.create_user(username=username, email=email, password=password)
+        user_profile = self.model(user=user, full_name=full_name, **extra_fields)
+        user_profile.save()
+        return user, user_profile
+
+
 class UserProfile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
@@ -104,6 +116,8 @@ class UserProfile(models.Model):
     # since we are defining following and followers we don't want that relation.
     following = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='followers')
     updated = models.DateTimeField(auto_now=True)
+
+    objects = UserProfileManager()
 
     def __str__(self):
         return self.full_name
