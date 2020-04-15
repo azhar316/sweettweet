@@ -17,11 +17,17 @@
             {% if tweet.image %}
             <img src="{{tweet.media.url}}">
             {% endif %}
-            <p>
-                <span>{{tweet.likes.count}}</span>
-                <span>{{tweet.retweets.count}}</span>
-                <span>{{tweet.comments.count}}</span>
-            </p>
+            <form action="{% url 'tweets:tweet_like' %}" method="post" class="post-form">{%csrf_token%}
+                <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+                <input type="hidden" name="previous_page" value="{{request.path}}">
+                <button type="submit" class="btn">{{tweet.likes.all|length}}</button>
+            </form>
+            <form action="{% url 'tweets:tweet_retweet' %}" method="post" class="post-form">{%csrf_token%}
+                <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+                <input type="hidden" name="previous_page" value="{{request.path}}">
+                <button type="submit" class="btn">{{tweet.retweets.all|length}}</button>
+            </form>
+            <span>{{tweet.comments.count}}</span>
         </div>
     </a>
     {% endfor %}

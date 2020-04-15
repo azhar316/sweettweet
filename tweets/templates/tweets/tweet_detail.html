@@ -7,8 +7,17 @@
         {% if tweet.image %}
         <img src="{{tweet.media.url}}">
         {% endif %}
-        <a href="">{{tweet.likes.count}}</a>
-        <a href="">{{tweet.retweets.count}}</a>
+        <form action="{% url 'tweets:tweet_like' %}" method="post" class="post-form">{%csrf_token%}
+            <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+            <input type="hidden" name="previous_page" value="{{request.path}}">
+            <button type="submit" class="btn">{{tweet.likes.all|length}}</button>
+        </form>
+        <form action="{% url 'tweets:tweet_retweet' %}" method="post" class="post-form">{%csrf_token%}
+            <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+            <input type="hidden" name="previous_page" value="{{request.path}}">
+            <button type="submit" class="btn">{{tweet.retweets.all|length}}</button>
+        </form>
+        {% endif %}
         <a href="">{{tweet.comments.count}}</a>
         {% if tweet.user == request.user %}
         <a href="{% url 'tweets:tweet_update' tweet.pk %}">Update</a>

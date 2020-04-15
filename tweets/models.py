@@ -5,19 +5,23 @@ from . import validators
 from . import utils
 
 
-class TweetLike(models.Model):
-    """A model for tweet likes. This model is used to know the
-     time a tweet was liked and the user who liked it."""
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="likes")
-    timestamp = models.DateTimeField(auto_now_add=True)
+class TweetManager(models.Manager):
 
+    def like_toggle(self, user, tweet):
+        tweet_like = TweetLike.objects.filter(user=user, tweet=tweet)
+        if tweet_like.exists():
+            tweet_like.delete()
+            liked = False
+        else:
+            __ = TweetLike.objects.create(user=user, tweet=tweet)
+            liked = True
+        return liked
 
-class TweetRetweet(models.Model):
-    """A model for retweets of tweets. This model is used to know the
-    time a tweet was retweeted and the user who retweeted it."""
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-                             related_name="retweets")
-    timestamp = models.DateTimeField(auto_now_add=True)
+    def retweet(self, user, tweet):
+        tweet_retweet = TweetRetweet.objects.filter(user=user, tweet=tweet)
+        if not tweet_retweet.exists():
+            tweet_retweet = TweetRetweet.objects.create(user=user, tweet=tweet)
+        return tweet_retweet
 
 
 class Tweet(models.Model):
@@ -29,13 +33,33 @@ class Tweet(models.Model):
                              blank=True, null=True,
                              validators=[validators.validate_file_extension],
                              help_text='Image or Video File')
-    likes = models.ManyToManyField(TweetLike, blank=True)
-    retweets = models.ManyToManyField(TweetRetweet, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    objects = TweetManager()
+
     def __str__(self):
         return self.text
+
+
+class TweetLike(models.Model):
+    """A model for tweet likes. This model is used to know the
+     time a tweet was liked and the user who liked it."""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                             related_name="tweet_likes")
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE,
+                              related_name="likes", null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+
+class TweetRetweet(models.Model):
+    """A model for retweets of tweets. This model is used to know the
+    time a tweet was retweeted and the user who retweeted it."""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                             related_name="tweet_retweets")
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE,
+                              related_name="retweets", null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
 
 class TweetComment(models.Model):

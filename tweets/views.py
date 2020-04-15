@@ -3,9 +3,9 @@ from django.shortcuts import (render, HttpResponseRedirect,
 from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
-from .models import Tweet
-from .models import TweetComment
+from .models import Tweet,  TweetComment, TweetRetweet
 from .forms import TweetForm, TweetCommentForm
 
 
@@ -121,3 +121,31 @@ class TweetCommentDeleteView(LoginRequiredMixin, generic.DeleteView):
 
     def get_success_url(self):
         return self.request.POST.get('previous_page', '/')
+
+
+@login_required
+def tweet_like(request):
+    if request.method == "GET":
+        return redirect('/')
+    tweet = get_object_or_404(Tweet, id=request.POST.get('tweet_id'))
+    liked = Tweet.objects.like_toggle(request.user, tweet)
+    return redirect(request.POST.get('previous_page'))
+
+
+@login_required
+def tweet_retweet(request):
+    if request.method == "GET":
+        return redirect('/')
+    tweet = get_object_or_404(Tweet, id=request.POST.get('tweet_id'))
+    retweet = Tweet.objects.retweet(request.user, tweet)
+    return redirect(request.POST.get('previous_page'))
+
+
+@login_required
+def delete_retweet(request):
+    if request.method == "GET":
+        return redirect('/')
+    tweet = get_object_or_404(Tweet, id=request.POST.get('tweet_id'))
+    retweet = get_object_or_404(TweetRetweet, user=request.user, tweet=tweet)
+    retweet.delete()
+    return redirect(request.POST.get('previous_page'))

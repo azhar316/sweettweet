@@ -14,4 +14,7 @@ urlpatterns = [
     path('tweet/comment/create/', views.TweetCommentCreateView.as_view(), name='tweet_comment_create'),
     path('tweet/comment/update/<int:pk>/', views.TweetCommentUpdateView.as_view(), name='tweet_comment_update'),
     path('tweet/comment/delete/', views.TweetCommentDeleteView.as_view(), name='tweet_comment_delete'),
+    path('tweet/like/', views.tweet_like, name='tweet_like'),
+    path('tweet/retweet/', views.tweet_retweet, name='tweet_retweet'),
+    path('tweet/retweet/delete/', views.delete_retweet, name='tweet_retweet_delete'),
 ]
