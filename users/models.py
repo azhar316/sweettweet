@@ -102,6 +102,14 @@ class UserProfileManager(models.Manager):
         user_profile.save()
         return user, user_profile
 
+    def create_or_get(self, user):
+        try:
+            user_profile = self.get_queryset().get(user=user)
+        except models.ObjectDoesNotExist:
+            user_profile = self.model(user=user, full_name='dummy-name')
+            user_profile.save()
+        return user_profile
+
 
 class UserProfile(models.Model):
 

@@ -67,7 +67,7 @@ class UserProfileDetailView(LoginRequiredMixin, generic.DetailView):
     context_object_name = 'profile'
 
     def get_object(self, queryset=None):
-        return UserProfile.objects.get(user=self.request.user)
+        return UserProfile.objects.create_or_get(user=self.request.user)
 
 
 class UserProfileUpdateView(LoginRequiredMixin, generic.View):
