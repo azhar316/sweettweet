@@ -17,7 +17,6 @@
             <input type="hidden" name="previous_page" value="{{request.path}}">
             <button type="submit" class="btn">{{tweet.retweets.all|length}}</button>
         </form>
-        {% endif %}
         <a href="">{{tweet.comments.count}}</a>
         {% if tweet.user == request.user %}
         <a href="{% url 'tweets:tweet_update' tweet.pk %}">Update</a>

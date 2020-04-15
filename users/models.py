@@ -102,6 +102,9 @@ class UserProfileManager(models.Manager):
         user_profile.save()
         return user, user_profile
 
+    def get_or_create(self):
+        pass
+
     def create_or_get(self, user):
         try:
             user_profile = self.get_queryset().get(user=user)
