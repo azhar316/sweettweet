@@ -3,10 +3,25 @@
 {% block content %}
 <div>
     <p>{{ profile.full_name }}</p>
-    <p>{{ request.user.username }}</p>
-    <p>{{ request.user.email }}</p>
+    <p>{{ user.username }}</p>
+    <p>{{ user.email }}</p>
     <p>{{ profile.bio }}</p>
     <img src="{{ profile.avatar.url }}">
-    <p><a href="{% url 'users:user_update' %}" class="btn">update</a></p>
+    <span>{{profile.get_following|length}}</span>
+    <span>{{profile.get_followers|length}}</span>
+    {% if request.user.is_authenticated %}
+    {% if user == request.user %}
+    <p><a href="{% url 'users:user_update' user.username %}" class="btn">update</a></p>
+    {% for rc_user_profile in user.profile.get_recommended_users %}
+    <span><a href="{% url 'users:user_detail' rc_user_profile.user.username%}">{{rc_user_profile.user.username}}</a></span><br>
+    {% endfor %}
+    {% else %}
+    <form action="{% url 'users:toggle_follow' %}" method="post" class="post-form">{%csrf_token%}
+        <input type="hidden" name="previous_page" value="{{request.path}}">
+        <input type="hidden" name="username" value="{{user.username}}">
+        <button type="submit" class="btn">{% if profile in request.user.profile.get_following %}Unfollow{%else%}Follow{%endif%}</button>
+    </form>
+    {% endif %}
+    {% endif %}
 </div>
 {% endblock %}

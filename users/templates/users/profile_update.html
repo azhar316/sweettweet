@@ -2,7 +2,7 @@
 
 {% block content %}
 <div>
-    <form action="{% url 'users:user_update' %}" method="post" class="post-form">{% csrf_token %}
+    <form action="{% url 'users:user_update' request.user.username %}" method="post" class="post-form">{% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn">Update</button>
     </form>

@@ -132,3 +132,40 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.full_name
+
+    def get_followers(self):
+        return self.followers.all()
+
+    def get_following(self):
+        return self.following.all()
+
+    def follow(self, user):
+        user_profile = UserProfile.objects.create_or_get(user)
+        self.following.add(user_profile)
+
+    def un_follow(self, user):
+        user_profile = UserProfile.objects.create_or_get(user)
+        self.following.remove(user_profile)
+
+    def is_following(self, user):
+        if self.get_following().filter(user=user).exists():
+            return True
+        else:
+            return False
+
+    def is_followed_by(self, user):
+        if self.get_followers().filter(user=user).exists():
+            return True
+        else:
+            return False
+
+    def toggle_follow(self, user):
+        if self.is_following(user):
+            self.un_follow(user)
+        else:
+            self.follow(user)
+
+    def get_recommended_users(self, limit_to=10):
+        following = self.get_following()
+        users = UserProfile.objects.all().exclude(id__in=[obj.id for obj in following])
+        return users.exclude(id=self.id).order_by('?')[:limit_to]

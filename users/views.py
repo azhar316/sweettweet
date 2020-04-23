@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
@@ -13,7 +13,6 @@ class UserRegisterView(generic.FormView):
 
     form_class = UserRegisterForm
     template_name = 'users/register.html'
-    success_url = reverse_lazy('users:user_detail')
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -32,12 +31,14 @@ class UserRegisterView(generic.FormView):
         login(self.request, user)
         return super().form_valid(form)
 
+    def get_success_url(self):
+        return reverse('users:user_detail', args=(self.request.user.username,))
+
 
 class UserLoginView(generic.FormView):
 
     form_class = UserLoginForm
     template_name = 'users/login.html'
-    success_url = reverse_lazy('users:user_detail')
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -55,26 +56,34 @@ class UserLoginView(generic.FormView):
         login(self.request, user)
         return super().form_valid(form)
 
+    def get_success_url(self):
+        return reverse('users:user_detail', args=(self.request.user.username,))
+
 
 def log_out(request):
     logout(request)
     return redirect('/')
 
 
-class UserProfileDetailView(LoginRequiredMixin, generic.DetailView):
+class UserProfileDetailView(generic.DetailView):
 
     template_name = 'users/profile_detail.html'
     context_object_name = 'profile'
 
     def get_object(self, queryset=None):
-        return UserProfile.objects.create_or_get(user=self.request.user)
+        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        return UserProfile.objects.create_or_get(user=user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['user'] = get_object_or_404(User, username=self.kwargs.get('username'))
+        return context
 
 
 class UserProfileUpdateView(LoginRequiredMixin, generic.View):
 
     form_class = UserProfileUpdateForm
     template_name = 'users/profile_update.html'
-    success_url = reverse_lazy('users:user_detail')
 
     def get(self, *args, **kwargs):
         user = self.request.user
@@ -103,4 +112,18 @@ class UserProfileUpdateView(LoginRequiredMixin, generic.View):
             user.save()
         else:
             raise ValidationError("Invalid form data")
-        return redirect(self.success_url)
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('users:user_detail', args=(self.request.user.username,))
+
+
+def follow_toggle_view(request):
+    if not request.method == "POST":
+        return redirect('/')
+    username = request.POST.get('username')
+    user = get_object_or_404(User, username=username)
+    user_profile = UserProfile.objects.create_or_get(request.user)
+    user_profile.toggle_follow(user)
+    print(request.POST.get('previous_page'))
+    return redirect(request.POST.get('previous_page'))
