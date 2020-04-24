@@ -1,53 +1,89 @@
 {% extends 'sweettweet/base.html' %}
 
 {% block content %}
-<div class="tweet">
-    <div>
-        <p>{{tweet.text}}</p>
-        {% if tweet.image %}
-        <img src="{{tweet.media.url}}">
-        {% endif %}
-        <form action="{% url 'tweets:tweet_like' %}" method="post" class="post-form">{%csrf_token%}
-            <input type="hidden" name="tweet_id" value="{{tweet.id}}">
-            <input type="hidden" name="previous_page" value="{{request.path}}">
-            <button type="submit" class="btn">{{tweet.likes.all|length}}</button>
-        </form>
-        <form action="{% url 'tweets:tweet_retweet' %}" method="post" class="post-form">{%csrf_token%}
-            <input type="hidden" name="tweet_id" value="{{tweet.id}}">
-            <input type="hidden" name="previous_page" value="{{request.path}}">
-            <button type="submit" class="btn">{{tweet.retweets.all|length}}</button>
-        </form>
-        <a href="">{{tweet.comments.count}}</a>
-        {% if tweet.user == request.user %}
-        <a href="{% url 'tweets:tweet_update' tweet.pk %}">Update</a>
-        <a href="{% url 'tweets:tweet_delete' tweet.pk %}">Delete</a>
-        {% endif %}
+<div class="row no-gutters">
+    <div class="col">
+        <div class="position-fixed">
+            {% include 'tweets/recommended_users.html' %}
+        </div>
     </div>
-    <div class="tweet-comments">
-        {% if request.user.is_authenticated %}
-        <div class="add-tweet-comment">
-            <form action="{% url 'tweets:tweet_comment_create' %}" method="post" class="post-form">{% csrf_token %}
-                <input type="hidden" name="tweet_id" value="{{tweet.id}}">
-                <input type="hidden" name="previous_page" value="{{request.path}}">
-                {{ comment_form.as_p }}
-                <button type="submit" class="btn">Comment</button>
-            </form>
+    <div class="col-6 box">
+        <div class="tweet border-dotted-bottom">
+            <div class="tweet-user">
+                <a href="{% url 'users:user_detail' tweet.user.username %}" class="nav-link link">
+                    <img src="{{tweet.user.profile.avatar.url}}" class="avatar float-left">
+                    <span style="font-weight:bold;">{{tweet.user.profile.full_name}}</span><br>
+                    <span class="text-muted">@{{tweet.user.username}}</span>
+                </a>
+            </div>
+            <div class="content padding-left-sm">
+                <p>{{tweet.text}}</p>
+                {% if tweet.image %}
+                <img src="{{tweet.media.url}}" class="img-thumbnail">
+                {% endif %}
+                <span class="text-muted">{{tweet.updated.time}} {{tweet.updated.date}}</span>
+            </div>
+            <div class="border-dotted-top border-dotted-bottom padding-top-exsm padding-bottom-exsm padding-left-sm">
+                <span><b>{{tweet.likes.all|length}}</b> Likes &emsp;</span>
+                <span><b>{{tweet.comments.all|length}}</b> Comments &emsp;</span>
+                <span><b>{{tweet.retweets.count}}</b> retweets &emsp;</span>
+            </div>
+            <div class="border-dotted-bottom padding-top-exsm padding-bottom-exsm padding-left-sm">
+                &emsp;
+                <form action="{% url 'tweets:tweet_like' %}" method="post" class="post-form d-inline">{%csrf_token%}
+                    <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+                    <input type="hidden" name="previous_page" value="{{request.path}}">
+                    <button type="submit" class="btn btn-outline-primary"><span class="far fa-thumbs-up"></span></button>
+                </form>&emsp;&emsp;
+                <form action="{% url 'tweets:tweet_retweet' %}" method="post" class="post-form d-inline">{%csrf_token%}
+                    <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+                    <input type="hidden" name="previous_page" value="{{request.path}}">
+                    <button type="submit" class="btn btn-outline-primary"><span class="fas fa-retweet"></span> {{tweet.retweets.all|length}}</button>
+                </form>&emsp;&emsp;
+                {% if request.user == tweet.user%}
+                <a href="{% url 'tweets:tweet_update' tweet.id %}" class="btn btn-outline-primary">Update</a>&emsp;&emsp;
+                <a href="{% url 'tweets:tweet_delete' tweet.id %}" class="btn btn-outline-danger">delete</a>
+                {% endif %}
+            </div>
+            <div class="padding-left-sm padding-top-sm padding-right-sm padding-bottom-sm">
+                <form action="{% url 'tweets:tweet_comment_create' %}" method="post" class="post-form">{% csrf_token %}
+                    <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+                    <input type="hidden" name="previous_page" value="{{request.path}}">
+                    {{comment_form.as_p}}
+                    <button type="submit" class="btn btn-primary">Comment</button>
+                </form>
+            </div>
+            <div>
+                {% for comment in tweet.comments.all %}
+                <div class="border-top">
+                    <div class="tweet-comment-user">
+                        <a href="{% url 'users:user_detail' comment.user.username %}" class="nav-link link">
+                            <img src="{{comment.user.profile.avatar.url}}" class="avatar">
+                            <span style="font-weight:bold;">{{comment.user.profile.full_name}}</span>
+                            <span class="text-muted">@{{comment.user.username}}</span>
+                            <span class="text-muted">{{comment.updated.time}} {{tweet.updated.date}}</span>
+                        </a>
+                    </div>
+                    <div class="padding-left-sm padding-bottom-sm">
+                        <p>{{comment.text}}</p>
+                        {% if request.user == comment.user %}
+                        <a href="{% url 'tweets:tweet_comment_update' comment.id %}" class="btn btn-outline-primary">Update</a>
+                        <form action="{% url 'tweets:tweet_comment_delete' %}" method="post" class="post-form d-inline">{%csrf_token%}
+                            <input type="hidden" name="comment_id" value="{{comment.id}}">
+                            <input type="hidden" name="previous_page" value="{{request.path}}">
+                            <button type="submit" class="btn btn-outline-danger delete-link">delete</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
-        {% endif %}
-        {% for comment in tweet.comments.all %}
-        <div class="tweet-comment">
-            <p>{{comment.user.email}}</p>
-            <p>{{comment.text}}</p>
-            {% if comment.user == request.user %}
-            <a href="{% url 'tweets:tweet_comment_update' comment.id %}" class="btn">Update</a>
-            <form action="{% url 'tweets:tweet_comment_delete' %}" method="post">{%csrf_token%}
-                <input type="hidden" name="comment_id" value="{{comment.id}}">
-                <input type="hidden" name="previous_page" value="{{request.path}}">
-                <button type="submit" class="btn delete-link">delete</button>
-            </form>
-            {% endif %}
+    </div>
+    <div class="col">
+        <div class="position-fixed">
+            {% include 'tweets/trending_hashtags.html' %}
         </div>
-        {% endfor %}
     </div>
 </div>
 

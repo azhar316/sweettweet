@@ -4,7 +4,7 @@
 <div>
     <form action="{% url 'users:user_update' request.user.username %}" method="post" class="post-form">{% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn">Update</button>
+        <button type="submit" class="btn btn-success">Update</button>
     </form>
 </div>
 {% endblock content %}

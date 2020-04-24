@@ -2,10 +2,11 @@
 
 {% block content %}
 <div class="">
+    <p>Are you sure you want to delete the tweet "<span class="text-info">{{tweet}}</span>" ?</p>
     <form method="post" class="post-form">{% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn">Delete</button>
-        <a href="{% url 'tweets:home' %}" class="btn">Cancel</a>
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a href="{% url 'tweets:home' %}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
 {% endblock content %}

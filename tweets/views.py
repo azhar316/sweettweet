@@ -63,6 +63,7 @@ class TweetUpdateView(LoginRequiredMixin, generic.UpdateView):
 class TweetDeleteView(LoginRequiredMixin, generic.DeleteView):
 
     template_name = 'tweets/confirm_tweet_delete.html'
+    context_object_name = 'tweet'
     success_url = reverse_lazy('tweets:home')
 
     def get_queryset(self):

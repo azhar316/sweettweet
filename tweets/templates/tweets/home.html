@@ -1,35 +1,57 @@
 {% extends 'sweettweet/base.html' %}
 
 {% block content %}
-<div class="tweet-new">
-    {% if user.is_authenticated %}
-    <form action="{% url 'tweets:tweet_create'%}" method="post" class="post-form">{%csrf_token%}
-        {{ tweet_form.as_p }}
-        <button type="submit">Tweet</button>
-    </form>
-    {% endif %}
-</div>
-<div class="tweets">
-    {% for tweet in tweets %}
-    <a href="{% url 'tweets:tweet_detail' tweet.pk %}">
-        <div class="tweet">
-            <p>{{tweet.text}}</p>
-            {% if tweet.image %}
-            <img src="{{tweet.media.url}}">
-            {% endif %}
-            <form action="{% url 'tweets:tweet_like' %}" method="post" class="post-form">{%csrf_token%}
-                <input type="hidden" name="tweet_id" value="{{tweet.id}}">
-                <input type="hidden" name="previous_page" value="{{request.path}}">
-                <button type="submit" class="btn">{{tweet.likes.all|length}}</button>
-            </form>
-            <form action="{% url 'tweets:tweet_retweet' %}" method="post" class="post-form">{%csrf_token%}
-                <input type="hidden" name="tweet_id" value="{{tweet.id}}">
-                <input type="hidden" name="previous_page" value="{{request.path}}">
-                <button type="submit" class="btn">{{tweet.retweets.all|length}}</button>
-            </form>
-            <span>{{tweet.comments.count}}</span>
+<div class="row no-gutters">
+    <div class="col h-100">
+        <div class="position-fixed">
+            {% include 'tweets/recommended_users.html' %}
         </div>
-    </a>
-    {% endfor %}
+    </div>
+    <div class="col-6 box">
+        <div class="tweet-new border-bottom padding-left-sm padding-bottom-sm">
+            {% if user.is_authenticated %}
+            <form action="{% url 'tweets:tweet_create'%}" method="post" class="post-form">{%csrf_token%}
+                {{ tweet_form.as_p }}
+                <button type="submit" class="btn btn-primary">Tweet</button>
+            </form>
+            {% endif %}
+        </div>
+        <div class="tweets">
+            {% for tweet in tweets %}
+            <div class="tweet border-dotted-bottom">
+                <div class="tweet-user">
+                    <a href="{% url 'users:user_detail' tweet.user.username %}" class="nav-link link">
+                        <img src="{{tweet.user.profile.avatar.url}}" class="avatar">
+                        <span style="font-weight:bold;">{{tweet.user.profile.full_name}}</span>
+                        <span class="text-muted">@{{tweet.user.username}}</span>
+                        <span class="text-muted">{{tweet.updated.time}} {{tweet.updated.date}}</span>
+                    </a>
+                </div>
+                <a href="{% url 'tweets:tweet_detail' tweet.pk %}" class="nav-link link">
+                    <p>{{tweet.text}}</p>
+                    {% if tweet.image %}
+                    <img src="{{tweet.media.url}}" class="img-thumbnail">
+                    {% endif %}
+                    <form action="{% url 'tweets:tweet_like' %}" method="post" class="post-form d-inline">{%csrf_token%}
+                        <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+                        <input type="hidden" name="previous_page" value="{{request.path}}">
+                        <button type="submit" class="btn btn-outline-primary"><span class="far fa-thumbs-up"></span> {{tweet.likes.all|length}}</button>
+                    </form>
+                    <p class="btn btn-outline-primary d-inline"><span class="far fa-comments"></span> {{tweet.comments.count}}</p>
+                    <form action="{% url 'tweets:tweet_retweet' %}" method="post" class="post-form d-inline">{%csrf_token%}
+                        <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+                        <input type="hidden" name="previous_page" value="{{request.path}}">
+                        <button type="submit" class="btn btn-outline-primary"><span class="fas fa-retweet"></span> {{tweet.retweets.all|length}}</button>
+                    </form>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col">
+        <div class="position-fixed">
+            {% include 'tweets/trending_hashtags.html' %}
+        </div>
+    </div>
 </div>
 {% endblock content %}

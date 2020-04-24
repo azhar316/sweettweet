@@ -1,0 +1,6 @@
+{% if request.user.is_authenticated %}
+<h3>{{request.user.username}}</h3><br><br><br>
+<h3>Recommended Users</h3>
+{% else %}
+<a href="{% url 'users:login' %}"><span class="btn btn-primary">Login</span></a>
+{% endif %}

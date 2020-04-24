@@ -11,7 +11,7 @@
     <span>{{profile.get_followers|length}}</span>
     {% if request.user.is_authenticated %}
     {% if user == request.user %}
-    <p><a href="{% url 'users:user_update' user.username %}" class="btn">update</a></p>
+    <p><a href="{% url 'users:user_update' user.username %}" class="btn btn-outline-success">update</a></p>
     {% for rc_user_profile in user.profile.get_recommended_users %}
     <span><a href="{% url 'users:user_detail' rc_user_profile.user.username%}">{{rc_user_profile.user.username}}</a></span><br>
     {% endfor %}
@@ -19,7 +19,7 @@
     <form action="{% url 'users:toggle_follow' %}" method="post" class="post-form">{%csrf_token%}
         <input type="hidden" name="previous_page" value="{{request.path}}">
         <input type="hidden" name="username" value="{{user.username}}">
-        <button type="submit" class="btn">{% if profile in request.user.profile.get_following %}Unfollow{%else%}Follow{%endif%}</button>
+        <button type="submit" class="btn btn-outline-primary">{% if profile in request.user.profile.get_following %}Unfollow{%else%}Follow{%endif%}</button>
     </form>
     {% endif %}
     {% endif %}

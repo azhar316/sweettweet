@@ -9,7 +9,7 @@ class TweetForm(forms.ModelForm):
         model = Tweet
         fields = ['text', 'media']
         widgets = {
-            'text': forms.Textarea(attrs={'cols': 60, 'rows': 5})
+            'text': forms.Textarea(attrs={'cols': 50, 'rows': 5})
         }
 
 
@@ -19,6 +19,6 @@ class TweetCommentForm(forms.ModelForm):
         model = TweetComment
         fields = ['text']
         widgets = {
-            'text': forms.Textarea(attrs={'cols': 40, 'rows': 1})
+            'text': forms.Textarea(attrs={'cols': 50, 'rows': 2})
         }
 
