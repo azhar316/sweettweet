@@ -15,6 +15,10 @@ class IndexView(generic.ListView):
     template_name = 'tweets/home.html'
     context_object_name = 'tweets'
 
+    def get_queryset(self):
+        tweets = Tweet.objects.all().order_by('-updated')
+        return tweets
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tweet_form'] = TweetForm()

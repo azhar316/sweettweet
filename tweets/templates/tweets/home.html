@@ -4,7 +4,13 @@
 <div class="row no-gutters">
     <div class="col h-100">
         <div class="position-fixed">
-            {% include 'sweettweet/recommended_users.html' %}
+            {% if request.user.is_authenticated %}
+            {% include 'sweettweet/recommended_users.html' with user_profiles=request.user.profile.get_recommended_users %}
+            {% else %}
+            <div class="text-center padding-top-sm">
+                <a href="{% url 'users:login' %}"><span class="btn btn-primary">Login</span></a>
+            </div>
+            {% endif %}
         </div>
     </div>
     <div class="col-6 box">
