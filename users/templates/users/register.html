@@ -1,10 +1,10 @@
 {% extends 'sweettweet/base.html' %}
 
 {% block content %}
-<div>
+<div class="">
     <form action="{% url 'users:register' %}" method="post" class="post-form">{% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">register</button>
+        <button type="submit" class="btn btn-success">register</button>
     </form>
 </div>
 {% endblock content %}

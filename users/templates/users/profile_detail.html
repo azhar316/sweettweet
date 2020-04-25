@@ -1,27 +1,140 @@
 {% extends 'sweettweet/base.html' %}
 
 {% block content %}
-<div>
-    <p>{{ profile.full_name }}</p>
-    <p>{{ user.username }}</p>
-    <p>{{ user.email }}</p>
-    <p>{{ profile.bio }}</p>
-    <img src="{{ profile.avatar.url }}">
-    <span>{{profile.get_following|length}}</span>
-    <span>{{profile.get_followers|length}}</span>
-    {% if request.user.is_authenticated %}
-    {% if user == request.user %}
-    <p><a href="{% url 'users:user_update' user.username %}" class="btn btn-outline-success">update</a></p>
-    {% for rc_user_profile in user.profile.get_recommended_users %}
-    <span><a href="{% url 'users:user_detail' rc_user_profile.user.username%}">{{rc_user_profile.user.username}}</a></span><br>
-    {% endfor %}
-    {% else %}
-    <form action="{% url 'users:toggle_follow' %}" method="post" class="post-form">{%csrf_token%}
-        <input type="hidden" name="previous_page" value="{{request.path}}">
-        <input type="hidden" name="username" value="{{user.username}}">
-        <button type="submit" class="btn btn-outline-primary">{% if profile in request.user.profile.get_following %}Unfollow{%else%}Follow{%endif%}</button>
-    </form>
-    {% endif %}
-    {% endif %}
+<div class="row no-gutters">
+    <div class="col h-100">
+        <div class="position-fixed">
+            {% include 'sweettweet/recommended_users.html' %}
+        </div>
+    </div>
+    <div class="col-6 box">
+        <div class="border-bottom padding-left-sm padding-top-sm padding-bottom-sm">
+            <img src="{{ profile.avatar.url }}" class="avatar-big">
+            <div class="float-right padding-top-bg padding-right-sm">
+                {% if request.user.is_authenticated %}
+                {% if user == request.user %}
+                <p><a href="{% url 'users:user_update' user.username %}" class="btn btn-outline-success">update</a></p>
+                {% else %}
+                <form action="{% url 'users:toggle_follow' %}" method="post" class="post-form">{%csrf_token%}
+                    <input type="hidden" name="previous_page" value="{{request.path}}">
+                    <input type="hidden" name="username" value="{{user.username}}">
+                    <button type="submit" class="btn btn-outline-primary">{% if profile in request.user.profile.get_following %}Unfollow{%else%}Follow{%endif%}</button>
+                </form>
+                {% endif %}
+                {% endif %}
+            </div>
+            <div class="padding-left-sm padding-top-sm">
+                <b><span>{{ profile.full_name }}</span></b><br>
+                <span class="text-muted">@{{ user.username }}</span>
+            </div>
+            <p class="padding-left-sm padding-top-sm">{{ profile.bio }}</p>
+            <p class="padding-left-sm"><span class="text-muted"> Joined {{ profile.user.date_joined.date }}</span></p>
+            <div class="padding-left-sm">
+                <span>{{profile.get_following|length}} Following</span>&emsp;
+                <span>{{profile.get_followers|length}} Followers</span>
+            </div>
+            <div class="padding-top-sm border-top border-bottom">
+                <h3>Recent Activity</h3>
+                {% for activity in profile.get_recent_activities %}
+                <div class="border-top">
+                    {% if activity.timestamp %}
+                    <span class="text-info">{{profile.full_name}} retweeted this</span>
+                    {% with tweet=activity.tweet%}
+                    <div class="tweet-user">
+                        <a href="{% url 'users:user_detail' tweet.user.username %}" class="nav-link link">
+                            <img src="{{tweet.user.profile.avatar.url}}" class="avatar">
+                            <span style="font-weight:bold;">{{tweet.user.profile.full_name}}</span>
+                            <span class="text-muted">@{{tweet.user.username}}</span>
+                            <span class="text-muted">{{tweet.updated.time}} {{tweet.updated.date}}</span>
+                        </a>
+                    </div>
+                    <a href="{% url 'tweets:tweet_detail' tweet.pk %}" class="nav-link link">
+                        <p>{{tweet.text}}</p>
+                        {% if tweet.image %}
+                        <img src="{{tweet.media.url}}" class="img-thumbnail">
+                        {% endif %}
+                        <form action="{% url 'tweets:tweet_like' %}" method="post" class="post-form d-inline">{%csrf_token%}
+                            <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+                            <input type="hidden" name="previous_page" value="{{request.path}}">
+                            <button type="submit" class="btn btn-outline-primary"><span class="far fa-thumbs-up"></span> {{tweet.likes.all|length}}</button>
+                        </form>
+                        <p class="btn btn-outline-primary d-inline"><span class="far fa-comments"></span> {{tweet.comments.count}}</p>
+                        <form action="{% url 'tweets:tweet_retweet' %}" method="post" class="post-form d-inline">{%csrf_token%}
+                            <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+                            <input type="hidden" name="previous_page" value="{{request.path}}">
+                            <button type="submit" class="btn btn-outline-primary"><span class="fas fa-retweet"></span> {{tweet.retweets.all|length}}</button>
+                        </form>
+                    </a>
+                    {% endwith %}
+                    {% else %}
+                    {% if activity.tweet %}
+                    {% with tweet=activity.tweet %}
+                    <span class="text-info">{{profile.full_name}} commented on this</span>
+                    <div class="tweet-user">
+                        <a href="{% url 'users:user_detail' tweet.user.username %}" class="nav-link link">
+                            <img src="{{tweet.user.profile.avatar.url}}" class="avatar">
+                            <span style="font-weight:bold;">{{tweet.user.profile.full_name}}</span>
+                            <span class="text-muted">@{{tweet.user.username}}</span>
+                            <span class="text-muted">{{tweet.updated.time}} {{tweet.updated.date}}</span>
+                        </a>
+                    </div>
+                    <a href="{% url 'tweets:tweet_detail' tweet.pk %}" class="nav-link link">
+                        <p>{{tweet.text}}</p>
+                        {% if tweet.image %}
+                        <img src="{{tweet.media.url}}" class="img-thumbnail">
+                        {% endif %}
+                        <form action="{% url 'tweets:tweet_like' %}" method="post" class="post-form d-inline">{%csrf_token%}
+                            <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+                            <input type="hidden" name="previous_page" value="{{request.path}}">
+                            <button type="submit" class="btn btn-outline-primary"><span class="far fa-thumbs-up"></span> {{tweet.likes.all|length}}</button>
+                        </form>
+                        <p class="btn btn-outline-primary d-inline"><span class="far fa-comments"></span> {{tweet.comments.count}}</p>
+                        <form action="{% url 'tweets:tweet_retweet' %}" method="post" class="post-form d-inline">{%csrf_token%}
+                            <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+                            <input type="hidden" name="previous_page" value="{{request.path}}">
+                            <button type="submit" class="btn btn-outline-primary"><span class="fas fa-retweet"></span> {{tweet.retweets.all|length}}</button>
+                        </form>
+                    </a>
+                    {% endwith %}
+                    {% else %}
+                    {% with tweet=activity%}
+                    <div class="tweet-user">
+                        <a href="{% url 'users:user_detail' tweet.user.username %}" class="nav-link link">
+                            <img src="{{tweet.user.profile.avatar.url}}" class="avatar">
+                            <span style="font-weight:bold;">{{tweet.user.profile.full_name}}</span>
+                            <span class="text-muted">@{{tweet.user.username}}</span>
+                            <span class="text-muted">{{tweet.updated.time}} {{tweet.updated.date}}</span>
+                        </a>
+                    </div>
+                    <a href="{% url 'tweets:tweet_detail' tweet.pk %}" class="nav-link link">
+                        <p>{{tweet.text}}</p>
+                        {% if tweet.image %}
+                        <img src="{{tweet.media.url}}" class="img-thumbnail">
+                        {% endif %}
+                        <form action="{% url 'tweets:tweet_like' %}" method="post" class="post-form d-inline">{%csrf_token%}
+                            <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+                            <input type="hidden" name="previous_page" value="{{request.path}}">
+                            <button type="submit" class="btn btn-outline-primary"><span class="far fa-thumbs-up"></span> {{tweet.likes.all|length}}</button>
+                        </form>
+                        <p class="btn btn-outline-primary d-inline"><span class="far fa-comments"></span> {{tweet.comments.count}}</p>
+                        <form action="{% url 'tweets:tweet_retweet' %}" method="post" class="post-form d-inline">{%csrf_token%}
+                            <input type="hidden" name="tweet_id" value="{{tweet.id}}">
+                            <input type="hidden" name="previous_page" value="{{request.path}}">
+                            <button type="submit" class="btn btn-outline-primary"><span class="fas fa-retweet"></span> {{tweet.retweets.all|length}}</button>
+                        </form>
+                    </a>
+                    {% endwith %}
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="position-fixed">
+            {% include 'sweettweet/trending_hashtags.html' %}
+        </div>
+    </div>
 </div>
 {% endblock %}

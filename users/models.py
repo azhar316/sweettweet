@@ -1,10 +1,12 @@
 import os
+from itertools import chain
 
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin, UnicodeUsernameValidator)
 
+from tweets.models import Tweet, TweetRetweet, TweetLike, TweetComment
 from . import utils
 
 
@@ -169,3 +171,12 @@ class UserProfile(models.Model):
         following = self.get_following()
         users = UserProfile.objects.all().exclude(id__in=[obj.id for obj in following])
         return users.exclude(id=self.id).order_by('?')[:limit_to]
+
+    def get_recent_activities(self, limit_to=20):
+        tweets = Tweet.objects.filter(user=self.user).order_by('-updated')
+        retweets = TweetRetweet.objects.filter(user=self.user).order_by('-timestamp')
+        comments = TweetComment.objects.filter(user=self.user).order_by('-updated')
+        activities = list(chain(tweets, retweets, comments))
+        sorted_activities = sorted(activities, key=utils.recent_activity_sort_helper,
+                                   reverse=True)[:limit_to]
+        return sorted_activities

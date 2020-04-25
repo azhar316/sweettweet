@@ -1,13 +1,13 @@
 {% extends 'sweettweet/base.html' %}
 
 {% block content %}
-<div>
+<div class="text-center">
     <p class="error-message">
         {{error_message}}
     </p>
     <form action="{% url 'users:login' %}" method="post" class="post-form">{% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Log in</button>
+        <button type="submit" class="btn btn-primary">Log in</button>
     </form>
 </div>
 {% endblock content %}
