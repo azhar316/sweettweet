@@ -7,7 +7,7 @@ class TweetForm(forms.ModelForm):
 
     class Meta:
         model = Tweet
-        fields = ['text', 'media']
+        fields = ['text', 'image']
         widgets = {
             'text': forms.Textarea(attrs={'cols': 50, 'rows': 5})
         }

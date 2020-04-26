@@ -33,11 +33,12 @@ class TweetCreateView(LoginRequiredMixin, generic.View):
         return redirect('tweets:index')
 
     def post(self, *args, **kwargs):
-        tweet_form = TweetForm(self.request.POST)
-        tweet = tweet_form.save(commit=False)
-        tweet.user = self.request.user
-        tweet.save()
-        return HttpResponseRedirect(reverse('tweets:tweet_detail', args=(tweet.id,)))
+        tweet_form = TweetForm(self.request.POST, self.request.FILES)
+        if tweet_form.is_valid():
+            tweet = tweet_form.save(commit=False)
+            tweet.user = self.request.user
+            tweet.save()
+            return HttpResponseRedirect(reverse('tweets:tweet_detail', args=(tweet.id,)))
 
 
 class TweetDetailView(generic.DetailView):

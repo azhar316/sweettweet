@@ -29,7 +29,7 @@
                 <a href="{% url 'tweets:tweet_detail' tweet.pk %}" class="nav-link link">
                     <p class="tweet-content">{{tweet.text}}</p>
                     {% if tweet.image %}
-                    <img src="{{tweet.media.url}}" class="img-thumbnail">
+                    <img src="{{tweet.image.url}}" class="img-thumbnail">
                     {% endif %}
                     <form action="{% url 'tweets:tweet_like' %}" method="post" class="post-form d-inline">{%csrf_token%}
                         <input type="hidden" name="tweet_id" value="{{tweet.id}}">

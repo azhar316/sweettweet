@@ -25,7 +25,7 @@
             <div class="content padding-left-sm">
                 <p class="tweet-content">{{tweet.text}}</p>
                 {% if tweet.image %}
-                <img src="{{tweet.media.url}}" class="img-thumbnail">
+                <img src="{{tweet.image.url}}" class="img-thumbnail">
                 {% endif %}
                 <span class="text-muted">{{tweet.updated.time}} {{tweet.updated.date}}</span>
             </div>

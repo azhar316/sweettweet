@@ -29,10 +29,10 @@ class Tweet(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING,
                              related_name='tweets')
     text = models.CharField(max_length=200, help_text='200 characters or fewer')
-    media = models.FileField(upload_to=utils.get_file_path,
-                             blank=True, null=True,
-                             validators=[validators.validate_file_extension],
-                             help_text='Image or Video File')
+    image = models.ImageField(upload_to=utils.get_file_path,
+                              blank=True, null=True,
+                              validators=[validators.validate_file_extension],
+                              help_text='Image')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
