@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate, login, logout
 
 from .models import User, UserProfile
+from hashtags.models import HashTag
 from .forms import UserProfileUpdateForm, UserRegisterForm, UserLoginForm
 
 
@@ -77,6 +78,7 @@ class UserProfileDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['user'] = get_object_or_404(User, username=self.kwargs.get('username'))
+        context['tags'] = HashTag.objects.all().order_by('-created')[:10]
         return context
 
 

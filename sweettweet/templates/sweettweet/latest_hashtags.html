@@ -1,0 +1,12 @@
+<div id="hashtags">
+    <h3>Latest Hashtags</h3><br>
+    {% for tag in tags %}
+    <div class="padding-left-bg">
+        <a href="{% url 'hashtags:tag' tag %}">#{{tag}}</a>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+
+</script>
