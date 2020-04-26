@@ -18,6 +18,7 @@ from django.urls import path, include
 from django.conf.urls.static import static
 
 from . import settings
+from . import views
 
 
 urlpatterns = [
@@ -25,6 +26,7 @@ urlpatterns = [
     path('', include('tweets.urls')),
     path('user/', include('users.urls')),
     path('hashtags/', include('hashtags.urls')),
+    path('search/', views.search_view, name='search')
 ]
 
 if settings.DEBUG:
