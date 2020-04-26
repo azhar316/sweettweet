@@ -117,5 +117,29 @@
         {% endblock content %}
     </div>
 
+    <script>
+        function hashtag_and_username_highlighter() {
+            var tag_regex = /#\S+/g;
+            var user_regex = /@\S+/g;
+            var tweets = document.getElementsByClassName('tweet-content');
+            for (var i = 0; i < tweets.length; i++) {
+                var tweet_text = tweets[i].textContent;
+                var tag_matches = tweet_text.match(tag_regex);
+                if (tag_matches) {
+                    tag_matches.forEach(function(match){
+                        tweet_text = tweet_text.replace(match, '<a href="/hashtags/'+match.slice(1)+'/">'+match+'</a>');
+                    });}
+                var user_matches = tweet_text.match(user_regex);
+                if (user_matches) {
+                    user_matches.forEach(function(match){
+                        tweet_text = tweet_text.replace(match, '<a href="/user/'+match.slice(1)+'/">'+match+'</a>');
+                    });}
+                tweets[i].innerHTML = tweet_text ;
+            }
+        }
+        window.onload = hashtag_and_username_highlighter;
+
+    </script>
+
 </body>
 </html>

@@ -14,16 +14,8 @@
         </div>
     </div>
     <div class="col-6 box">
-        <div class="tweet-new border-bottom padding-left-sm padding-bottom-sm">
-            {% if user.is_authenticated %}
-            <form action="{% url 'tweets:tweet_create'%}" method="post" class="post-form">{%csrf_token%}
-                {{ tweet_form.as_p }}
-                <button type="submit" class="btn btn-primary">Tweet</button>
-            </form>
-            {% endif %}
-        </div>
         <div class="tweets">
-            {% for tweet in tweets %}
+            {% for tweet in tag.get_tweets %}
             <div class="tweet border-dotted-bottom">
                 <div class="tweet-user">
                     <a href="{% url 'users:user_detail' tweet.user.username %}" class="nav-link link">

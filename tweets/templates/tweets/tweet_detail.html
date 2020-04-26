@@ -23,7 +23,7 @@
                 </a>
             </div>
             <div class="content padding-left-sm">
-                <p>{{tweet.text}}</p>
+                <p class="tweet-content">{{tweet.text}}</p>
                 {% if tweet.image %}
                 <img src="{{tweet.media.url}}" class="img-thumbnail">
                 {% endif %}
@@ -71,7 +71,7 @@
                         </a>
                     </div>
                     <div class="padding-left-sm padding-bottom-sm">
-                        <p>{{comment.text}}</p>
+                        <p class="tweet-content">{{comment.text}}</p>
                         {% if request.user == comment.user %}
                         <a href="{% url 'tweets:tweet_comment_update' comment.id %}" class="btn btn-outline-primary">Update</a>
                         <form action="{% url 'tweets:tweet_comment_delete' %}" method="post" class="post-form d-inline">{%csrf_token%}
