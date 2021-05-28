@@ -132,7 +132,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # used to reference static (css) files from templates
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'sweettweet', 'static'), ]
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'sweettweet', 'static'), ]
 
 
 MEDIA_URL = '/media/'
